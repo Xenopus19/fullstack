@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant browser
+    participant server
+    activate browser
+    Note over browser, server: User write new note text in text field<br>and click the Save button.<br>Browser add new note to local notes list.<br>Clear the input form.<br>redrawNotes() displays the updated list of the notes.
+    browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa<br>content-type = application/json<br>Payload: {content: , date: }
+    deactivate browser
+    activate server
+    Note over server: The server creates a new note object,<br>and adds it to an array called notes.
+    server-->>browser: Responds with HTTP status code 201. Resource created.<br>content-type = application/json<br>{"message": "note created"}
+    deactivate server
+	activate browser
+	deactivate browser

@@ -1,0 +1,40 @@
+sequenceDiagram
+    participant browser
+    participant server
+    activate browser
+    Note over browser, server: User write new note text in text field<br>and click the Save button
+    browser->>server: POST https://studies.cs.helsinki.fi/exampleapp/new_note<br>content-type = application/x-www-form-urlencoded<br>Payload: note = "1234567890"
+    deactivate browser
+    activate server
+    Note over server: The server creates a new note object, and adds it to an array called notes.
+    server-->>browser: Responds with HTTP status code 302. This is a URL redirect to<br>location = /exampleapp/notes
+    deactivate server
+    activate browser
+    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/notes
+    deactivate browser
+    activate server
+    server-->>browser: Responds with HTTP status code 200. Request was successful.<br>content-type = text/html<br>HTML Document
+    deactivate server
+    activate browser
+    Note over browser: Browser reloads the Notes page.
+    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/main.css
+    deactivate browser
+    activate server
+    server-->>browser: Responds with HTTP status code 200. Request was successful.<br>content-type = text/css<br>Style sheet main.css file
+    deactivate server
+    activate browser
+    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/main.js
+    deactivate browser
+    activate server
+    server-->>browser: Responds with HTTP status code 200. Request was successful.<br>content-type = application/javascript<br>JavaScript code main.js file
+    deactivate server
+    activate browser
+    Note over browser: Browser executes the JavaScript code.
+    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/data.json
+    deactivate browser
+    activate server
+    server-->>browser: Responds with HTTP status code 200. Request was successful.<br>content-type = application/json<br>Contents of the notes list in Json format
+    deactivate server
+    activate browser
+    Note over browser, server: When the data has been fetched,<br>the browser executes an event handler,<br>which renders the notes to the page using the DOM-API.
+    deactivate browser

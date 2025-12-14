@@ -1,0 +1,32 @@
+sequenceDiagram
+    participant browser
+    participant server
+    activate browser
+    Note over browser, server: User open in browser<br>https://studies.cs.helsinki.fi/exampleapp/spa
+    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/spa
+    deactivate browser
+    activate server
+    server-->>browser: Responds with HTTP status code 200. Request was successful.<br>content-type = text/html<br>HTML Document
+    deactivate server
+    activate browser
+    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/main.css
+    deactivate browser
+    activate server
+    server-->>browser: Responds with HTTP status code 200. Request was successful.<br>content-type = text/css<br>Style sheet main.css file
+    deactivate server
+    activate browser
+    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/spa.js
+    deactivate browser
+    activate server
+    server-->>browser: Responds with HTTP status code 200. Request was successful.<br>content-type = application/javascript<br>JavaScript code spa.js file
+    deactivate server
+    activate browser
+    Note over browser: Browser executes the JavaScript code.<br>Requests download from server<br>contents of the notes list in Json format
+    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/data.json
+    deactivate browser
+    activate server
+    server-->>browser: Responds with HTTP status code 200. Request was successful.<br>content-type = application/json<br>Contents of the notes list in Json format
+    deactivate server
+    activate browser
+    Note over browser, server: When the data has been fetched,<br>the browser executes an event handler,<br>which renders the notes to the local notes list<br>and to the page using the DOM-API.
+    deactivate browser
