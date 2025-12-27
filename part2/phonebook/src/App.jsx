@@ -94,7 +94,8 @@ const App = () => {
     if(!window.confirm("Do you want to delete person?")) return
     personsService.deleteObject(id).then(
         data => {
-            const newPersons = persons.filter(person => person.id !== data.id)
+            const newPersons = persons.filter(person => person.id !== id)
+            console.log(persons)
             setPersons(newPersons)
         }
     )
