@@ -45,7 +45,7 @@ const App = () => {
 
   const getPersonsToShow = () =>{
     if(newSearch === '') return persons
-    return persons.filter(person => person.name.toLowerCase().startsWith(newSearch))
+    return persons.filter(person => person.name.toLowerCase().startsWith(newSearch.toLowerCase()))
   }
 
   const handleAddPerson = (event) => {
@@ -72,7 +72,10 @@ const App = () => {
         setNewMessage({message: "New person added", isError: false})
         setTimeout(()=>setNewMessage({message:'', isError: false}), 5000)
     }
-    )
+    ).catch(error => {
+        setNewMessage({message: error.response.data.error, isError: true})
+        setTimeout(() => setNewMessage({message:'', isError:false}), 5000)
+    })
   }
 
   const updatePersonInfo = (person) => {
@@ -84,8 +87,8 @@ const App = () => {
             setNewName("")
             setNewPhone("")
         }
-    ).catch(() => {
-        setNewMessage({message: "The person is already deleted", isError: true})
+    ).catch((error) => {
+        setNewMessage({message: error.response.data.error, isError: true})
         setTimeout(() => setNewMessage({message:'', isError:false}), 5000)
     })
   } 

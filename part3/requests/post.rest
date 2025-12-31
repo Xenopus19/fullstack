@@ -2,6 +2,6 @@ POST http://localhost:3001/api/persons
 Content-Type: application/json
 
 {
-  "name": "VS code rest client is pretty handy tool",
-  "number": "123-4567890"
+  "name": "VS c",
+  "number": "1-4567890"
 }

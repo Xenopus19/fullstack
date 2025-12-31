@@ -6,6 +6,7 @@ const url = `mongodb+srv://fullstack:${password}@cluster0.1jrt6lt.mongodb.net/?a
 
 mongoose.set('strictQuery', false)
 
+
 mongoose.connect(url, {family: 4})
 .then(() => console.log('connected to MongoDB'))
 .catch(error => console.log('error connecting to MongoDB:', error.message))
