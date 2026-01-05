@@ -1,0 +1,26 @@
+{
+  "name": "bloglist",
+  "version": "0.0.1",
+  "description": "",
+  "license": "ISC",
+  "author": "Damnation Foundation",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node index.js",
+    "dev": "cross-env NODE_ENV=development node --watch index.js",
+    "test": "cross-env NODE_ENV=test node --test"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "lodash": "^4.17.21",
+    "mongoose": "^9.1.1"
+  },
+  "devDependencies": {
+    "supertest": "^7.1.4"
+  }
+}
