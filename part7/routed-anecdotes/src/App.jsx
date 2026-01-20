@@ -1,4 +1,15 @@
-import { useState } from 'react'
+import { useState } from "react"
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  Navigate,
+  useParams,
+  useNavigate,
+  useMatch,
+} from "react-router-dom"
+import { useField } from "./hooks"
 
 const Menu = () => {
   const padding = {
@@ -6,9 +17,9 @@ const Menu = () => {
   }
   return (
     <div>
-      <a href='#' style={padding}>anecdotes</a>
-      <a href='#' style={padding}>create new</a>
-      <a href='#' style={padding}>about</a>
+      <Link to='/' style={padding}>anecdotes</Link>
+      <Link to='/create' style={padding}>create</Link>
+      <Link to='/about' style={padding}>about</Link>
     </div>
   )
 }
@@ -17,10 +28,33 @@ const AnecdoteList = ({ anecdotes }) => (
   <div>
     <h2>Anecdotes</h2>
     <ul>
-      {anecdotes.map(anecdote => <li key={anecdote.id} >{anecdote.content}</li>)}
+      {anecdotes.map(anecdote => <li key={anecdote.id} >
+        <Link to={`/anecdotes/${anecdote.id}`}> 
+        {anecdote.content}
+        </Link>
+        </li>)}
     </ul>
   </div>
 )
+
+const AnecdotePage = ({anecdote}) => {
+  return(
+    <div>
+      <p>{anecdote.content}</p>
+      <p>by {anecdote.author}</p>
+      <p>has {anecdote.votes} votes</p>
+      <p>info: {anecdote.info}</p>
+    </div>
+  )
+}
+
+const Notification = ({message}) => {
+  if(message==='') return
+
+  return(
+    <p>{message}</p>
+  )
+}
 
 const About = () => (
   <div>
@@ -38,27 +72,43 @@ const About = () => (
 
 const Footer = () => (
   <div>
+    <footer>
     Anecdote app for <a href='https://fullstackopen.com/'>Full Stack Open</a>.
 
     See <a href='https://github.com/fullstack-hy2020/routed-anecdotes/blob/master/src/App.js'>https://github.com/fullstack-hy2020/routed-anecdotes/blob/master/src/App.js</a> for the source code.
+    </footer>
   </div>
 )
 
 const CreateNew = (props) => {
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
+  const content = useField('text')
+  const author = useField('text')
+  const info = useField('text')
+  const navigate = useNavigate()
 
 
   const handleSubmit = (e) => {
     e.preventDefault()
     props.addNew({
-      content,
-      author,
-      info,
+      content: content.value,
+      author: author.value,
+      info: info.value,
       votes: 0
     })
+    navigate('/')
+    props.setNotification(`a new anecdote ${content.value} added`)
   }
+
+  const resetFields = (e) => {
+    e.preventDefault()
+    content.reset()
+    author.reset()
+    info.reset()
+  }
+
+  const { reset: authorReset, ...authorInput } = author
+  const { reset: infoReset, ...infoInput } = info
+  const { reset: contentReset, ...contentInput } = content
 
   return (
     <div>
@@ -66,17 +116,18 @@ const CreateNew = (props) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input name='content' value={content} onChange={(e) => setContent(e.target.value)} />
+          <input {...contentInput} />
         </div>
         <div>
           author
-          <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
+          <input {...authorInput}/>
         </div>
         <div>
           url for more info
-          <input name='info' value={info} onChange={(e)=> setInfo(e.target.value)} />
+          <input {...infoInput}/>
         </div>
-        <button>create</button>
+        <button type='submit'>create</button>
+        <button onClick={resetFields}>reset</button>
       </form>
     </div>
   )
@@ -103,6 +154,11 @@ const App = () => {
 
   const [notification, setNotification] = useState('')
 
+  const match = useMatch('/anecdotes/:id')
+  const anecdote = match 
+    ? anecdotes.find(anecdote => anecdote.id === Number(match.params.id))
+    : null
+
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000)
     setAnecdotes(anecdotes.concat(anecdote))
@@ -122,13 +178,22 @@ const App = () => {
     setAnecdotes(anecdotes.map(a => a.id === id ? voted : a))
   }
 
+  const showNotification = message => {
+    setNotification(message)
+    setTimeout(() => setNotification(''), 3000)
+  }
+
   return (
     <div>
       <h1>Software anecdotes</h1>
       <Menu />
-      <AnecdoteList anecdotes={anecdotes} />
-      <About />
-      <CreateNew addNew={addNew} />
+      <Notification message={notification}/>
+      <Routes>
+        <Route path='/' element={<AnecdoteList anecdotes={anecdotes}/>} />
+        <Route path='/create' element={<CreateNew addNew={addNew} setNotification={showNotification}/>} />
+        <Route path='/about' element={<About/>} />
+        <Route path='/anecdotes/:id' element={<AnecdotePage anecdote={anecdote}/>} />
+      </Routes>
       <Footer />
     </div>
   )
