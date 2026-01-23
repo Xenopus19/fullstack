@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1768037199211" clover="3.2.0">
+  <project timestamp="1768037199211" name="All files">
+    <metrics statements="10" coveredstatements="9" conditionals="6" coveredconditionals="5" methods="4" coveredmethods="3" elements="20" coveredelements="17" complexity="0" loc="10" ncloc="10" packages="1" files="1" classes="1"/>
+    <file name="Blog.jsx" path="D:\fullstack\part5\bloglist-frontend\src\components\Blog.jsx">
+      <metrics statements="10" coveredstatements="9" conditionals="6" coveredconditionals="5" methods="4" coveredmethods="3"/>
+      <line num="3" count="1" type="stmt"/>
+      <line num="4" count="3" type="stmt"/>
+      <line num="6" count="3" type="stmt"/>
+      <line num="8" count="3" type="stmt"/>
+      <line num="16" count="3" type="stmt"/>
+      <line num="17" count="1" type="stmt"/>
+      <line num="19" count="1" type="stmt"/>
+      <line num="24" count="1" type="stmt"/>
+      <line num="27" count="3" type="stmt"/>
+      <line num="39" count="0" type="stmt"/>
+    </file>
+  </project>
+</coverage>
