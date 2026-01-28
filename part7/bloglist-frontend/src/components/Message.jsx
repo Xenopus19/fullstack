@@ -1,5 +1,10 @@
-const Message = ({ message, isError }) => {
-  if(message==='') return
+import { useSelector } from "react-redux";
+
+const Message = () => {
+  const notification = useSelector((state) => {
+    return state.notification});
+  if(notification.message === '') return
+  const isError = notification.isError
 
   const cardStyle = {
     padding: '15px',
@@ -12,7 +17,7 @@ const Message = ({ message, isError }) => {
   return(
 
     <div style={cardStyle}>
-      {message}
+      {notification.message}
     </div>
   )
 }

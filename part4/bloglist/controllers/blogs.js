@@ -32,6 +32,19 @@ blogsRouter.post("/", extractUser, async (request, response) => {
   response.status(201).json(result);
 });
 
+blogsRouter.post("/:id/comments", async (request, response) => {
+  const newComment = request.body.comment;
+
+  const blog = await Blog.findById(request.params.id).populate('user', { username: 1, name: 1 });;
+  if (!blog) {
+    return response.status(404).end();
+  }
+  blog.comments = blog.comments.concat(newComment)
+
+  const updatedBlog = await blog.save()
+  response.json(updatedBlog)
+});
+
 blogsRouter.delete("/:id", extractUser, async (request, response) => {
   const blogToDelete = await Blog.findById(request.params.id)
   if(request.user.id.toString() !== blogToDelete.user.toString())

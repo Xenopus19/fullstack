@@ -1,4 +1,8 @@
 .DS_STORE
+part8/node_modules
+part7/bloglist-frontend/node_modules
+part4/bloglist/node_modules
+
 node_modules
 node_modules/
 scripts/flow/*/.flowconfig

@@ -1,78 +1,77 @@
-import { useState, useEffect, useRef } from 'react'
-import Blog from './components/Blog'
-import blogService from './services/blogs'
-import loginService from './services/login'
-import CreateBlog from './components/CreateBlog'
-import Message from './components/Message'
-import Toggleable from './components/Toggleable'
+import { useState, useEffect, useRef } from "react";
+import Blog from "./components/Blog";
+import CreateBlog from "./components/CreateBlog";
+import Message from "./components/Message";
+import Toggleable from "./components/Toggleable";
+import { useDispatch, useSelector } from "react-redux";
+import { makeNotification } from "./reducers/notificationReducer";
+import {
+  addNewBlog,
+  commentExistingBlog,
+  deleteExistingBlog,
+  initBlogs,
+  updateExistingBlog,
+} from "./reducers/blogsReducer";
+import { authorizeUser, loadUser, logoutUser } from "./reducers/userReducer";
+import Users from "./components/Users";
+import MainPage from "./components/mainPage";
+import {
+  createBrowserRouter,
+  Link,
+  Outlet,
+  RouterProvider,
+} from "react-router-dom";
+import UserInfo from "./components/UserInfo";
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
-  const [newMessage, setNewMessage] = useState({
-    message : '',
-    isError : false
-  })
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(initBlogs());
+  }, [dispatch]);
 
-  const createBlogRef = useRef(null)
+  const createBlogRef = useRef(null);
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
-  }, [])
-
-  useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogUser')
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-      blogService.setToken(user.data.token)
-    }
-  }, [])
+    dispatch(loadUser());
+  }, [dispatch]);
 
   const handleLogin = async (event) => {
-    event.preventDefault()
-    console.log('logging in with', username, password)
+    event.preventDefault();
+    console.log("logging in with", username, password);
 
     try {
-      const user = await loginService.login({ username, password })
-      window.localStorage.setItem('loggedBlogUser', JSON.stringify(user))
-      setUser(user)
-      blogService.setToken(user.data.token)
-      setUsername('')
-      setPassword('')
-      displayMessage('logged in', false)
+      await dispatch(authorizeUser(username, password));
+      setUsername("");
+      setPassword("");
+      displayMessage("logged in", false);
     } catch {
-      displayMessage('wrong credentials', true)
+      displayMessage("wrong credentials", true);
     }
-  }
+  };
 
   const displayMessage = (message, isError) => {
-    setNewMessage({ message: message, isError:isError })
-    setTimeout(() => {
-      setNewMessage({ message:'', isError:false })
-    }, 5000)
-  }
+    dispatch(makeNotification(message, isError));
+  };
 
   const handleLogout = () => {
-    console.log('logging out...')
-    window.localStorage.clear()
-    setUser(null)
-    blogService.setToken('')
-  }
+    dispatch(logoutUser());
+  };
 
-  const handleCreateBlog = async blog => {
-    try{
-      const result = await blogService.create(blog)
-      setBlogs(blogs.concat(result))
-      displayMessage(`new blog added: ${result.title} by ${result.author}`, false)
-      createBlogRef.current.toggleVisibility()
+  const handleCreateBlog = async (blog) => {
+    try {
+      dispatch(addNewBlog(blog));
+      displayMessage(
+        `new blog added: ${result.title} by ${result.author}`,
+        false,
+      );
+      createBlogRef.current.toggleVisibility();
+    } catch {
+      displayMessage("error adding blog", true);
     }
-    catch{
-      displayMessage('error adding blog', true)
-    }
-  }
+  };
 
   const loginForm = () => {
     return (
@@ -86,7 +85,7 @@ const App = () => {
               value={username}
               onChange={({ target }) => setUsername(target.value)}
               autoComplete="username"
-              placeholder='username'
+              placeholder="username"
             />
           </label>
         </div>
@@ -98,70 +97,107 @@ const App = () => {
               value={password}
               onChange={({ target }) => setPassword(target.value)}
               autoComplete="current-password"
-              placeholder='password'
+              placeholder="password"
             />
           </label>
         </div>
         <button type="submit">Login</button>
       </form>
-    )
-  }
+    );
+  };
 
-  const blogList = () => {
-    return (
-      <>
-        <h2>blogs</h2>
-        {getSortedBlogs().map((blog) => (
-          <Blog key={blog.id} blog={blog} deleteBlog={deleteBlog} updateBlog={updateBlog} currentUser={user}/>
-        ))}
-      </>
-    )
-  }
-
-  const updateBlog = async updatedBlog => {
-    try{
-      console.log(updatedBlog)
-      const response = await blogService.update(updatedBlog)
-      const updatedBlogs = blogs.map(blog => blog.id===response.id ? response : blog)
-      setBlogs(updatedBlogs)
-    } catch{
-      displayMessage('error updating blog', true)
-    }
-  }
-
-  const deleteBlog = async blogToDelete => {
-    if(!window.confirm(`Delete the ${blogToDelete.title} blog?`)) return
+  const updateBlog = async (updatedBlog) => {
     try {
-      await blogService.deleteBlog(blogToDelete)
-      const newBlogs = blogs.filter(blog => blog.id!==blogToDelete.id)
-      setBlogs(newBlogs)
+      await dispatch(updateExistingBlog(updatedBlog));
     } catch {
-      displayMessage('A user is unauthorized to delete the blog', true)
+      dispatch(makeNotification("error updating blog", true));
     }
+  };
+
+  const deleteBlog = async (blogToDelete) => {
+    if (!window.confirm(`Delete the ${blogToDelete.title} blog?`)) return;
+    try {
+      dispatch(deleteExistingBlog(blogToDelete));
+    } catch {
+      dispatch(makeNotification("error deleting blog", true));
+    }
+  };
+
+  const commentBlog = (blog, comment) => {
+    dispatch(commentExistingBlog(blog, comment))
   }
 
-  const getSortedBlogs = () => {
-    const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes)
-    console.log(sortedBlogs)
-    return sortedBlogs
-  }
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: (
+        <>
+          <div
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: "center",
+              display: "flex",
+              gap: 10,
+              borderWidth: 1,
+              borderColor: "black",
+              border: "solid",
+              borderRadius: 5,
+              margin: 10,
+              padding: 10,
+            }}
+          >
+            <h4 style={{ marginTop: 0, marginBottom: 0 }}>User {user?.name} is logged in</h4>
+            <button onClick={handleLogout}>Logout</button>
+            <nav>
+              <Link style={{ marginRight: 10 }} to="/users">
+                users
+              </Link>
+              <Link style={{ marginRight: 10 }} to="/">
+                blogs
+              </Link>
+            </nav>
+          </div>
+          <Outlet></Outlet>
+        </>
+      ),
+      children: [
+        {
+          path: "/users",
+          element: <Users />,
+        },
+        {
+          path: "/",
+          element: (
+            <MainPage
+              createBlogRef={createBlogRef}
+              handleCreateBlog={handleCreateBlog}
+            />
+          ),
+        },
+        {
+          path: "/users/:id",
+          element: <UserInfo />,
+        },
+        {
+          path: "/blogs/:id",
+          element: <Blog updateBlog={updateBlog} deleteBlog={deleteBlog} commentBlog={commentBlog} />,
+        },
+      ],
+    },
+  ]);
 
   return (
     <div>
-      <Message message={newMessage.message} isError={newMessage.isError}/>
+      <Message />
       {user && (
         <div>
-          <h4>User {user.data.name} is logged in</h4>
-          <button onClick={handleLogout}>Logout</button>
-          <Toggleable buttonLabel = 'Create blog' ref = {createBlogRef} >
-            <CreateBlog submitBlog={handleCreateBlog}></CreateBlog>
-          </Toggleable>
-          {blogList()}
+          <RouterProvider router={router} />
         </div>
       )}
       {!user && loginForm()}
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;

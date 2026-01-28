@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
 
-const Blog = ({ blog, updateBlog, deleteBlog, currentUser }) => {
-  const [showFull, setShowFull] = useState(false)
-
-  const toggleShowFull = () => setShowFull(!showFull)
+const Blog = ({updateBlog, deleteBlog, commentBlog}) => {
+  const {id} = useParams()
+  const blog = useSelector(state => state.blogs).find(b => b.id===id)
+  const currentUser = useSelector(state => state.user)
 
   const blogStyle = {
     padding: 4,
@@ -24,22 +25,35 @@ const Blog = ({ blog, updateBlog, deleteBlog, currentUser }) => {
     updateBlog(updatedBlog)
   }
 
+  const addComment = event => {
+    event.preventDefault()
+
+    commentBlog(blog, event.target.comment.value)
+    event.target.comment.value = ''
+  }
+
+  if(!blog) return
+
   return (
     <div style={blogStyle} className='blog'>
-      <p>
+      <h3>
         {blog.title} {blog.author}
-      </p>
-      {showFull && (
-        <div>
+      </h3>
+      <div>
           <p>Url: {blog.url}</p>
           <p>Likes: {blog.likes}</p>
           {blog.user?.username && <p>User: {blog.user.username}</p>}
           <button onClick={increaseLikes}>♥</button>
-          <button onClick={toggleShowFull}>Hide</button>
-          {currentUser.data.username===blog.user?.username && <button onClick={() => deleteBlog(blog)}>Delete</button>}
+          {currentUser.username===blog.user?.username && <button onClick={() => deleteBlog(blog)}>Delete</button>}
+          <h4>Comments:</h4>
+          <ul>
+            {blog.comments.map(comment => <li key={comment}>{comment}</li>)}
+          </ul>
+          <form onSubmit={addComment}>
+            <input name='comment' type='text' placeholder='comment'></input>
+            <button type='submit'>add comment</button>
+          </form>
         </div>
-      )}
-      {!showFull && <button onClick={toggleShowFull}>View</button>}
     </div>
   )
 }
