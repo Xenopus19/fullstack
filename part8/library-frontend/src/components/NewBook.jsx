@@ -1,4 +1,7 @@
-import { useState } from 'react'
+import { cache, useState } from 'react'
+import { useMutation } from "@apollo/client/react";
+import { CREATE_BOOK, ALL_AUTHORS, ALL_BOOKS } from "../queries";
+import { addBookToCache } from '../utils/apolloCache';
 
 const NewBook = (props) => {
   const [title, setTitle] = useState('')
@@ -7,14 +10,16 @@ const NewBook = (props) => {
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
 
-  if (!props.show) {
-    return null
-  }
+    const [addBook] = useMutation(CREATE_BOOK, {
+    update: (cache, response) => {
+      addBookToCache(cache, response.data.addBook)
+    }
+  })
 
   const submit = async (event) => {
     event.preventDefault()
 
-    console.log('add book...')
+    addBook({variables: {title, author, published: parseInt(published), genres}})
 
     setTitle('')
     setPublished('')

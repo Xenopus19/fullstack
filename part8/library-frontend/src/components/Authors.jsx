@@ -1,12 +1,11 @@
+import UpdateAuthor from "../components/UpdateAuthor";
+
 const Authors = (props) => {
-  if (!props.show) {
-    return null
-  }
-  const authors = []
+  const authors = props.authors
 
   return (
     <div>
-      <h2>authors</h2>
+      <h2>Authors</h2>
       <table>
         <tbody>
           <tr>
@@ -23,6 +22,7 @@ const Authors = (props) => {
           ))}
         </tbody>
       </table>
+      <UpdateAuthor authors={authors}/>
     </div>
   )
 }
