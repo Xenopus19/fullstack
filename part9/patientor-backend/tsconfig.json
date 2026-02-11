@@ -1,0 +1,14 @@
+{
+  // Visit https://aka.ms/tsconfig to read more about this file
+  "compilerOptions": {
+  "target": "ES6",
+  "module": "commonjs",
+  "moduleResolution": "node",
+  "outDir": "./build/",
+  "strict": true,
+  "esModuleInterop": true,
+  "skipLibCheck": true,
+  "noUnusedLocals": true,
+  "noUnusedParameters": true
+}
+}
