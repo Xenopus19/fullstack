@@ -1,0 +1,11 @@
+POST http://localhost:3001/api/patients/d2773336-f723-11e9-8f0b-362b9e155667/entries
+Content-Type: application/json
+
+{
+  "type": "HealthCheck",
+  "description": "Yearly routine check-up for eyes and blood pressure.",
+  "date": "2026-02-14",
+  "specialist": "Dr. House",
+  "healthCheckRating": 0,
+  "diagnosisCodes": ["H35.3", "Z01.0"]
+}
