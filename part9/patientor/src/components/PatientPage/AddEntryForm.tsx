@@ -17,11 +17,11 @@ import {
 } from "@mui/material";
 import patients from "../../services/patients";
 
-interface AddEntryFormProps{
-    addEntry: (newEntry: NewEntry) => void
+interface AddEntryFormProps {
+  addEntry: (newEntry: NewEntry) => void;
 }
 
-const AddEntryForm = ({addEntry}:AddEntryFormProps) => {
+const AddEntryForm = ({ addEntry }: AddEntryFormProps) => {
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [specialist, setSpecialist] = useState("");
@@ -53,7 +53,10 @@ const AddEntryForm = ({addEntry}:AddEntryFormProps) => {
               placeholder="HealthCheckRating"
               value={healthCheckRating}
               onChange={({ target }) => {
-                setHealthCheckRating(Number(target.value))
+                const value = Number(target.value);
+                if (value in HealthCheckRating) {
+                  setHealthCheckRating(value);
+                }
               }}
             ></input>
           </>
@@ -116,7 +119,7 @@ const AddEntryForm = ({addEntry}:AddEntryFormProps) => {
         newEntry = {
           ...newBase,
           type: "HealthCheck",
-          healthCheckRating
+          healthCheckRating,
         };
         break;
 
@@ -126,8 +129,8 @@ const AddEntryForm = ({addEntry}:AddEntryFormProps) => {
           type: "Hospital",
           discharge: {
             date: dischargeDate,
-            criteria: dischargeCriteria
-          }
+            criteria: dischargeCriteria,
+          },
         };
         break;
 
@@ -141,7 +144,7 @@ const AddEntryForm = ({addEntry}:AddEntryFormProps) => {
         if (sickLeaveStartDate !== "" && sickLeaveEndDate !== "") {
           newEntry.sickLeave = {
             startDate: sickLeaveStartDate,
-            endDate: sickLeaveEndDate
+            endDate: sickLeaveEndDate,
           };
         }
         break;
